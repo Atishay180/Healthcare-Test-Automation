@@ -12,26 +12,24 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class CommonUtilities {
+
+    public static String testCaseFolderPath = "";
+
     // screenshots capturing method
     public static void captureScreenshot(String fileName, WebDriver driver){
         try {
             System.out.println("Capturing Screenshot...");
 
-            //path for saving the screenshot
-            String screenshotDir = System.getProperty("user.dir") + "/reports/screenshots";
-
-            //create directory if not exists
-            File dir = new File(screenshotDir);
-            if(!dir.exists()){
-                dir.mkdirs();
-                System.out.println("Screenshot folder created at: " + dir.getAbsolutePath());
-            }
-
             //captureScreenshot;
             File src = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
 
+            String folderPath = CommonUtilities.testCaseFolderPath;
+            if(folderPath == null){
+                throw new RuntimeException("Folder path not initialized...");
+            }
+
             //save screenshot
-            String filePath = screenshotDir + "/" + fileName + "_" + System.currentTimeMillis() + ".png";
+            String filePath = folderPath + "/" + fileName + "_" + System.currentTimeMillis() + ".png";
 
             //FileHandler.copy(src, new File(filePath));
             Files.copy(src.toPath(), new File(filePath).toPath());
@@ -42,14 +40,14 @@ public class CommonUtilities {
         }
     }
 
-    // todays date in day-month-year format method
+    // today's date in day-month-year format method
     public static String getTodaysDate(){
         SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy");
         String todayDate = formatter.format(new Date());
         return todayDate;
     }
 
-    // todays date folder creation method
+    // today's date folder creation method
     public static String createTodaysDateFolder(){
 
         System.out.println("Creating today's date folder inside AutomationReports...");
@@ -99,6 +97,7 @@ public class CommonUtilities {
     public static String createTestCaseFolder(String testCaseNumber){
         String todaysDate = getTodaysDate();
         String folderDir = System.getProperty("user.dir") + "/AutomationReports/" + todaysDate + "/TC_" + testCaseNumber;
+        testCaseFolderPath = folderDir;
         File dir = new File(folderDir);
 
         if(dir.exists()){
