@@ -1,14 +1,16 @@
 package utils;
 
-import org.openqa.selenium.OutputType;
-import org.openqa.selenium.TakesScreenshot;
-import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.*;
 import org.openqa.selenium.io.FileHandler;
+import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.util.Date;
 
 public class CommonUtilities {
@@ -121,6 +123,35 @@ public class CommonUtilities {
         }
 
         return folderDir;
+    }
+
+    // wait until element gets visible method
+    public static void waitUntilVisible(WebDriver driver, WebElement element){
+        System.out.println("Waiting until element is visible: " + element);
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
+        wait.until(ExpectedConditions.visibilityOf(element));
+        System.out.println("Element is now visible: " + element);
+    }
+
+    // wait until element becomes clickable method
+    public static void waitUntilClickable(WebDriver driver, WebElement element){
+        System.out.println("Waiting until element is clickable: " + element);
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
+        wait.until(ExpectedConditions.elementToBeClickable(element));
+        System.out.println("Element is now clickable: " + element);
+    }
+
+    // scroll to element method
+    public static void scrollToElement(WebDriver driver, WebElement element){
+        try {
+            System.out.println("Scrolling to element: " + element);
+            ((JavascriptExecutor)driver).executeScript("arguments[0].scrollIntoView(true);", element);
+            System.out.println("Successfully scrolled to element: " + element);
+        } catch (Exception e) {
+            System.err.println("Failed to scroll to element: " + e.getMessage());
+            captureScreenshot("ScrollToElement_Failure", driver);
+            throw e;
+        }
     }
 
 }

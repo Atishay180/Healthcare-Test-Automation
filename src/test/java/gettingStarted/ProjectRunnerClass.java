@@ -5,6 +5,8 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
+import pages.AuthPage;
+import pages.HomePage;
 import utils.CommonUtilities;
 
 import java.util.Map;
@@ -26,12 +28,17 @@ public class ProjectRunnerClass {
         String TestCase = args.get("Test Case");
         String folderPath = CommonUtilities.createTestCaseFolder(TestCase);
 
-        driver.get("https://google.com");
+        driver.get("http://localhost:5173");
         driver.manage().window().fullscreen();
-        CommonUtilities.captureScreenshot("testSS", driver);
 
-        System.out.println("Test Execution Started");
-        System.out.println("Full Name = " + args.get("Full Name") + " | Email = " + args.get("Email"));
-        System.out.println("Test execution completed");
+        HomePage homepage = new HomePage(driver);
+        homepage.closeAlertBar();
+
+        AuthPage authPage = homepage.getAuthPage();
+        authPage.loginUser(args);
+
+        if(args.get("Book Appointment").equalsIgnoreCase("Yes")){
+            homepage.navigateToAppointmentPage(args.get("Doctor"));
+        }
     }
 }
