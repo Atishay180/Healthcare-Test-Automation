@@ -9,10 +9,12 @@ import utils.CommonUtilities;
 import java.util.Map;
 
 public class AuthPage {
-    WebDriver driver;
+    private final WebDriver driver;
+    private final Map<String, String> args;
 
-    public AuthPage(WebDriver driver){
+    public AuthPage(WebDriver driver, Map<String, String> args){
         this.driver = driver;
+        this.args = args;
         PageFactory.initElements(driver, this);
     }
 
@@ -37,7 +39,7 @@ public class AuthPage {
     @FindBy(xpath = "//form/div/button[text()=\"Create Account\"]")
     private WebElement btnCreateAccount;
 
-    public void loginUser(Map<String, String> args) {
+    public void loginUser() {
         try {
             // create a new account
             if(args.get("Create Account").equalsIgnoreCase("Yes")){
@@ -63,7 +65,7 @@ public class AuthPage {
         } catch (Exception e) {
             System.err.println("Error occurred during login: " + e.getMessage());
             CommonUtilities.captureScreenshot("TestCase Failure", driver);
-            driver.close();
+            driver.quit();
             throw e;
         }
     }

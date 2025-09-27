@@ -5,6 +5,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
+import pages.AppointmentPage;
 import pages.AuthPage;
 import pages.HomePage;
 import utils.CommonUtilities;
@@ -25,20 +26,27 @@ public class ProjectRunnerClass {
 
     @Test(dataProvider = "excelData", dataProviderClass = ExcelDataProvider.class)
     public void UITest(Map<String, String> args) {
-        String TestCase = args.get("Test Case");
-        String folderPath = CommonUtilities.createTestCaseFolder(TestCase);
+        try {
+            String TestCase = args.get("Test Case");
+            String folderPath = CommonUtilities.createTestCaseFolder(TestCase);
 
-        driver.get("http://localhost:5173");
-        driver.manage().window().fullscreen();
+            driver.get("http://localhost:5173");
+            driver.manage().window().fullscreen();
 
-        HomePage homepage = new HomePage(driver);
-        homepage.closeAlertBar();
+            HomePage homepage = new HomePage(driver, args);
+            homepage.closeAlertBar();
 
-        AuthPage authPage = homepage.getAuthPage();
-        authPage.loginUser(args);
+            AuthPage authPage = homepage.getAuthPage();
+            authPage.loginUser();
 
-        if(args.get("Book Appointment").equalsIgnoreCase("Yes")){
-            homepage.navigateToAppointmentPage(args.get("Doctor"));
+            if(args.get("Book Appointment").equalsIgnoreCase("Yes")){
+                AppointmentPage appointmentPage = homepage.navigateToAppointmentPage(args.get("Doctor Name"));
+                appointmentPage.bookAppointment();
+            }
+        } catch (Exception e) {
+            CommonUtilities.captureScreenshot("TestCase Failure", driver);
+            throw new RuntimeException(e);
         }
+
     }
 }

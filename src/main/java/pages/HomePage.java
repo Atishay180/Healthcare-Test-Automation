@@ -10,10 +10,12 @@ import utils.CommonUtilities;
 import java.util.Map;
 
 public class HomePage {
-    WebDriver driver;
+    private final WebDriver driver;
+    private final Map<String, String> args;
 
-    public HomePage(WebDriver driver){
+    public HomePage(WebDriver driver, Map<String, String> args){
         this.driver = driver;
+        this.args = args;
         PageFactory.initElements(driver, this);
     }
 
@@ -38,7 +40,7 @@ public class HomePage {
             CommonUtilities.captureScreenshot("Alert Bar", driver);
             btnAlert.click();
         } catch (Exception e) {
-            System.err.println("Error in alert bar" + e.getMessage());
+            System.err.println("Error in alert bar: " + e.getMessage());
             CommonUtilities.captureScreenshot("TestCase Failure", driver);
             driver.quit();
             throw new RuntimeException(e);
@@ -50,16 +52,16 @@ public class HomePage {
             CommonUtilities.captureScreenshot("Home Page", driver);
             lnkAuthPage.click();
 
-            return new AuthPage(driver);
+            return new AuthPage(driver, args);
         } catch (Exception e) {
-            System.err.println("Error in home page" + e.getMessage());
+            System.err.println("Error in home page: " + e.getMessage());
             CommonUtilities.captureScreenshot("TestCase Failure", driver);
             driver.quit();
             throw new RuntimeException(e);
         }
     }
 
-    public void navigateToAppointmentPage(String doctorName){
+    public AppointmentPage navigateToAppointmentPage(String doctorName){
         try {
             CommonUtilities.waitUntilVisible(driver, lblTopDoctors);
             CommonUtilities.scrollToElement(driver, lblTopDoctors);
@@ -72,8 +74,10 @@ public class HomePage {
             CommonUtilities.captureScreenshot("Top Doctors", driver);
 
             lnkDoctorAppointmentPage.click();
+
+            return new AppointmentPage(driver, args);
         } catch (Exception e){
-            System.err.println("Error in home page" + e.getMessage());
+            System.err.println("Error in home page: " + e.getMessage());
             CommonUtilities.captureScreenshot("TestCase Failure", driver);
             driver.quit();
             throw new RuntimeException(e);
