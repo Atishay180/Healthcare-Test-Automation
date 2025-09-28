@@ -1,5 +1,6 @@
 package pages;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -22,16 +23,28 @@ public class AppointmentPage {
     @FindBy(xpath = "//div/p[contains(text(), \"Appointment fee\")]/span")
     private WebElement txtAppointmentFee;
 
+    @FindBy(xpath = "//button[text()='Book an appointment']")
+    private WebElement btnBookAppointment;
+
+    //dynamic xpath for doctor name
     public WebElement getDoctorLink(String doctorName){
         String dynamicPath = "//div/p[text()='" + doctorName + "']";
         System.out.println("Looking for doctor: " + doctorName);
         return driver.findElement(By.xpath(dynamicPath));
     }
 
+    //dynamic xpath for slot date and slot day
+    public Pair<WebElement, WebElement> getSlot(int date, String time){
+        String dynamicDatePath = "//div/p[text()='" + date + "']";
+        String dynamicTimePath = "//div/p[text()='" + time + "']";
+
+        WebElement dateElement = driver.findElement(By.xpath(dynamicDatePath));
+        WebElement timeElement = driver.findElement(By.xpath(dynamicTimePath));
+        return Pair.of(dateElement, timeElement);
+    }
+
     public void bookAppointment(){
         try {
-            CommonUtilities.captureScreenshot("Appointment Page", driver);
-
             WebElement txtDoctorName = getDoctorLink(args.get("Doctor Name"));
 
             // verify doctor name
@@ -46,7 +59,7 @@ public class AppointmentPage {
             // verify appointment fee method
             //fee displayed
             String appointmentFee = txtAppointmentFee.getText().trim();
-            String amountDisplayedStr = appointmentFee.replaceAll("[^0-9]", "");;
+            String amountDisplayedStr = appointmentFee.replaceAll("[^0-9]", "");
             int amountDisplayed = Integer.parseInt(amountDisplayedStr);
 
             //actual fee extracted from sheet
@@ -59,6 +72,37 @@ public class AppointmentPage {
                         + actualAmount + " but found: " + amountDisplayed);
             }
             System.out.println("Appointment Fee verified successfully.");
+
+
+            //slot date and time
+            String slotDateStrActual = args.get("Slot Date").trim(); //dd
+            double slotDateDoubleActual = Double.parseDouble(slotDateStrActual);
+            int slotDateActual = (int)slotDateDoubleActual;
+            System.out.println("Actual Slot Date = " + slotDateActual);
+
+            String slotTimeActual = args.get("Slot Time").trim() + " " + args.get("Session").toLowerCase().trim();
+            System.out.println("Actual Slot Time = " + slotTimeActual);
+
+            Pair<WebElement, WebElement> slotElement = getSlot(slotDateActual, slotTimeActual);
+            WebElement dateElement = slotElement.getLeft();
+            WebElement timeElement = slotElement.getRight();
+
+            if(!dateElement.isDisplayed()){
+                throw new AssertionError("Selected date not found: " + slotDateActual);
+            }
+            if(!timeElement.isDisplayed()){
+                throw new AssertionError("Selected time not found: " + slotTimeActual);
+            }
+
+            dateElement.click();
+            System.out.println("Slot date selected: " + slotDateActual);
+
+            timeElement.click();
+            System.out.println("Slot time selected: " + slotTimeActual);
+
+            CommonUtilities.captureScreenshot("Appointment Page", driver);
+
+            btnBookAppointment.click();
 
         } catch (AssertionError ae) {
             CommonUtilities.captureScreenshot("ValidationFailure", driver);
