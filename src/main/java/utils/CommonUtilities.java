@@ -125,6 +125,14 @@ public class CommonUtilities {
         return folderDir;
     }
 
+    // wait until locator gets visible method
+    public static void waitUntilVisibleByLocator(WebDriver driver, By locator){
+        System.out.println("Waiting until element is locator: " + locator);
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
+        System.out.println("Locator is now visible: " + locator);
+    }
+
     // wait until element gets visible method
     public static void waitUntilVisible(WebDriver driver, WebElement element){
         System.out.println("Waiting until element is visible: " + element);
