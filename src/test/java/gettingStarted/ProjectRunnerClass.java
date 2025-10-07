@@ -11,19 +11,27 @@ import pages.AppointmentPage;
 import pages.AuthPage;
 import pages.HomePage;
 import utils.CommonUtilities;
+import utils.ReportUtils;
 
+import java.io.File;
 import java.util.Map;
 
 public class ProjectRunnerClass {
     public static String sheetPath = System.getProperty("user.dir") + "/src/test/resources/data/TestingAutomationExcelSheet.xlsx";
     public static String sheetName = "Sheet1";
     public static String TestCase = "";
+    public static File reportFile;
 
     WebDriver driver;
 
     @BeforeSuite
     public void BeforeTestAction() {
         String folderPath = CommonUtilities.createTodaysDateFolder();
+        reportFile = new File(folderPath, "TestReport.xlsx");
+        if (!reportFile.exists()) {
+            ReportUtils.createExcelReport(reportFile);
+        }
+        System.out.println("Report initialized at: " + reportFile.getAbsolutePath());
     }
 
     @BeforeMethod
@@ -33,6 +41,11 @@ public class ProjectRunnerClass {
 
     @Test(dataProvider = "excelData", dataProviderClass = ExcelDataProvider.class)
     public void UITest(Map<String, String> args) {
+        long startTime = System.currentTimeMillis();
+        String testCase = args.get("Test Case");
+        String status = "PASS";
+        String description = "Executed successfully";
+
         try {
             String TestCase = args.get("Test Case");
             String folderPath = CommonUtilities.createTestCaseFolder(TestCase);
@@ -67,8 +80,17 @@ public class ProjectRunnerClass {
                 CommonUtilities.captureScreenshot("My Appointments", driver);
             }
         } catch (Exception e) {
+            status = "FAIL";
+            description = e.getMessage();
             CommonUtilities.captureScreenshot("TestCase Failure", driver);
-            throw new RuntimeException(e);
+        } finally {
+            long endTime = System.currentTimeMillis();
+            double duration = (endTime - startTime) / 1000.0;
+
+            // Write result to Excel
+            ReportUtils.writeTestResults(reportFile, testCase, status, duration, description);
+
+            System.out.println("Test completed: " + testCase + " | Status: " + status);
         }
     }
 

@@ -1,72 +1,61 @@
 package utils;
 
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.*;
 
 public class ReportUtils {
 
-    public static final String FILE_PATH = "TestReport.xlsx";
+    public static void createExcelReport(File file) {
+        try (Workbook workbook = new XSSFWorkbook()) {
+            Sheet sheet = workbook.createSheet("TestReport");
 
-    public static void createExcelReport(int testCaseId, boolean isPassed, String errorMessage, long durationMills){
+            // Header row
+            Row headerRow = sheet.createRow(0);
+            headerRow.createCell(0).setCellValue("Test Case");
+            headerRow.createCell(1).setCellValue("Status");
+            headerRow.createCell(2).setCellValue("Execution Time");
+            headerRow.createCell(3).setCellValue("Description");
 
-        Workbook workbook;
-        Sheet sheet;
+            // Header background color
+            CellStyle headerStyle = workbook.createCellStyle();
+            headerStyle.setFillForegroundColor(IndexedColors.LIGHT_CORNFLOWER_BLUE.getIndex());
+            headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 
-        try {
+            for (Cell cell : headerRow) cell.setCellStyle(headerStyle);
 
-            File file = new File(FILE_PATH);
-
-            // create sheet if it does not exist
-            if(file.exists()){
-                System.out.println("Opening existing report file: " + FILE_PATH);
-                FileInputStream fis = new FileInputStream(file);
-                workbook = new XSSFWorkbook(fis);
-                sheet = workbook.getSheetAt(0);
-                fis.close();
-            } else {
-                System.out.println("Creating new report file: " + FILE_PATH);
-                workbook = new XSSFWorkbook();
-                sheet = workbook.createSheet("TestReport");
-
-                // create header row
-                Row headerRow = sheet.createRow(0);
-                headerRow.createCell(0).setCellValue("Test Case");
-                headerRow.createCell(1).setCellValue("Status");
-                headerRow.createCell(2).setCellValue("Execution Time");
-                headerRow.createCell(3).setCellValue("Description");
+            try (FileOutputStream fos = new FileOutputStream(file)) {
+                workbook.write(fos);
             }
 
-            // getting next empty row
+            System.out.println("Excel report created successfully at: " + file.getAbsolutePath());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void writeTestResults(File file, String testCase, String status, double duration, String description) {
+        try (FileInputStream fis = new FileInputStream(file); Workbook workbook = new XSSFWorkbook(fis)) {
+
+            Sheet sheet = workbook.getSheetAt(0);
             int lastRowNum = sheet.getLastRowNum();
             Row row = sheet.createRow(lastRowNum + 1);
 
-            // file row data
-            row.createCell(0).setCellValue("TC_" + testCaseId);
-            row.createCell(1).setCellValue(isPassed ? "Pass" : "Fail");
-            row.createCell(2).setCellValue(durationMills);
-            row.createCell(3).setCellValue(isPassed ? "N/A" : errorMessage);
+            row.createCell(0).setCellValue("TC_" + testCase);
+            row.createCell(1).setCellValue(status);
+            row.createCell(2).setCellValue(duration);
+            row.createCell(3).setCellValue(description);
 
-            Row headerRow = sheet.getRow(0);
-            for(int i = 0 ; i < headerRow.getLastCellNum() ; i++){
-                sheet.autoSizeColumn(i);
+            for (int i = 0; i < 4; i++) sheet.autoSizeColumn(i);
+
+            try (FileOutputStream fos = new FileOutputStream(file)) {
+                workbook.write(fos);
             }
 
-            FileOutputStream fos = new FileOutputStream(FILE_PATH);
-            workbook.write(fos);
-            fos.close();
-            workbook.close();
-
-
-            System.out.println("Excel report generated successfully at: " + FILE_PATH);
+            System.out.println("Data added for: " + testCase);
         } catch (Exception e) {
-            System.out.println("Error while writing test result for " + testCaseId);
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 }
