@@ -7,6 +7,7 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 import utils.CommonUtilities;
 
+import java.util.List;
 import java.util.Map;
 
 public class HomePage {
@@ -19,9 +20,6 @@ public class HomePage {
         PageFactory.initElements(driver, this);
     }
 
-    @FindBy(id = "close-prompt-button")
-    private WebElement btnAlert;
-
     @FindBy(xpath = "//button[text()=\"Create Account\"]")
     private WebElement lnkAuthPage;
 
@@ -30,15 +28,20 @@ public class HomePage {
 
     //dynamic xpath for doctor name
     public WebElement getDoctorLink(WebDriver driver, String doctorName){
-        String dynamicPath = "//div/h3[text()='" + doctorName + "']";
         System.out.println("Looking for doctor: " + doctorName);
-        return driver.findElement(By.xpath(dynamicPath));
+        return driver.findElement(By.id(doctorName));
     }
 
     public void closeAlertBar(){
         try {
-            CommonUtilities.captureScreenshot("Alert Bar", driver);
-            btnAlert.click();
+            List<WebElement> alerts = driver.findElements(By.id("close-prompt-button"));
+            if(!alerts.isEmpty() && alerts.get(0).isDisplayed()){
+                CommonUtilities.captureScreenshot("Alert Bar", driver);
+                alerts.get(0).click();
+                System.out.println("Closing Alert Bar...");
+            } else {
+                System.out.println("No alert found, skipping...");
+            }
         } catch (Exception e) {
             System.err.println("Error in alert bar: " + e.getMessage());
             CommonUtilities.captureScreenshot("TestCase Failure", driver);
@@ -50,6 +53,7 @@ public class HomePage {
     public AuthPage getAuthPage(){
         try {
             CommonUtilities.captureScreenshot("Home Page", driver);
+            CommonUtilities.waitUntilVisible(driver, lnkAuthPage);
             lnkAuthPage.click();
 
             return new AuthPage(driver, args);

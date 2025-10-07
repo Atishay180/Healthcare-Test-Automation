@@ -6,8 +6,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.interactions.Actions;
-import org.testng.annotations.BeforeSuite;
-import org.testng.annotations.Test;
+import org.testng.annotations.*;
 import pages.AppointmentPage;
 import pages.AuthPage;
 import pages.HomePage;
@@ -20,11 +19,16 @@ public class ProjectRunnerClass {
     public static String sheetName = "Sheet1";
     public static String TestCase = "";
 
-    WebDriver driver = new ChromeDriver();
+    WebDriver driver;
 
     @BeforeSuite
     public void BeforeTestAction() {
         String folderPath = CommonUtilities.createTodaysDateFolder();
+    }
+
+    @BeforeMethod
+    public void setup() {
+        driver = new ChromeDriver();
     }
 
     @Test(dataProvider = "excelData", dataProviderClass = ExcelDataProvider.class)
@@ -66,6 +70,12 @@ public class ProjectRunnerClass {
             CommonUtilities.captureScreenshot("TestCase Failure", driver);
             throw new RuntimeException(e);
         }
+    }
 
+    @AfterMethod
+    public void tearDown() {
+        if (driver != null) {
+            driver.quit(); // close browser after each test case
+        }
     }
 }

@@ -33,14 +33,16 @@ public class AppointmentPage {
         return driver.findElement(By.xpath(dynamicPath));
     }
 
-    //dynamic xpath for slot date and slot day
-    public Pair<WebElement, WebElement> getSlot(int date, String time){
+    //dynamic xpath for slot date
+    public WebElement getSlotDateElement(int date){
         String dynamicDatePath = "//div/p[text()='" + date + "']";
-        String dynamicTimePath = "//div/p[text()='" + time + "']";
+        return driver.findElement(By.xpath(dynamicDatePath));
+    }
 
-        WebElement dateElement = driver.findElement(By.xpath(dynamicDatePath));
-        WebElement timeElement = driver.findElement(By.xpath(dynamicTimePath));
-        return Pair.of(dateElement, timeElement);
+    //dynamic xpath for slot time
+    public WebElement getSlotTimeElement(String time){
+        String dynamicTimePath = "//div/p[text()='" + time + "']";
+        return driver.findElement(By.xpath(dynamicTimePath));
     }
 
     public void bookAppointment(){
@@ -74,34 +76,34 @@ public class AppointmentPage {
             System.out.println("Appointment Fee verified successfully.");
 
 
-            //slot date and time
+            //---------------------------slot date---------------------------
             String slotDateStrActual = args.get("Slot Date").trim(); //dd
             double slotDateDoubleActual = Double.parseDouble(slotDateStrActual);
             int slotDateActual = (int)slotDateDoubleActual;
             System.out.println("Actual Slot Date = " + slotDateActual);
-
-            String slotTimeActual = args.get("Slot Time").trim() + " " + args.get("Session").toLowerCase().trim();
-            System.out.println("Actual Slot Time = " + slotTimeActual);
-
-            Pair<WebElement, WebElement> slotElement = getSlot(slotDateActual, slotTimeActual);
-            WebElement dateElement = slotElement.getLeft();
-            WebElement timeElement = slotElement.getRight();
+            WebElement dateElement = getSlotDateElement(slotDateActual);
 
             if(!dateElement.isDisplayed()){
                 throw new AssertionError("Selected date not found: " + slotDateActual);
-            }
-            if(!timeElement.isDisplayed()){
-                throw new AssertionError("Selected time not found: " + slotTimeActual);
             }
 
             dateElement.click();
             System.out.println("Slot date selected: " + slotDateActual);
 
+            //---------------------------slot time---------------------------
+            String slotTimeActual = args.get("Slot Time").trim() + " " + args.get("Session").toLowerCase().trim();
+            System.out.println("Actual Slot Time = " + slotTimeActual);
+            WebElement timeElement = getSlotTimeElement(slotTimeActual);
+
+            if(!timeElement.isDisplayed()){
+                throw new AssertionError("Selected time not found: " + slotTimeActual);
+            }
+
             timeElement.click();
             System.out.println("Slot time selected: " + slotTimeActual);
 
+            //---------------------------book appointment button---------------------------
             CommonUtilities.captureScreenshot("Appointment Page", driver);
-
             btnBookAppointment.click();
 
         } catch (AssertionError ae) {
