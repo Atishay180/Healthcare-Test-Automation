@@ -15,11 +15,16 @@ public class ReportUtils {
             Row headerRow = sheet.createRow(0);
             headerRow.createCell(0).setCellValue("Test Case");
             headerRow.createCell(1).setCellValue("Status");
-            headerRow.createCell(2).setCellValue("Execution Time");
-            headerRow.createCell(3).setCellValue("Description");
+            headerRow.createCell(2).setCellValue("Start Time");
+            headerRow.createCell(3).setCellValue("Execution Time");
+            headerRow.createCell(4).setCellValue("Description");
+
 
             // Header background color
             CellStyle headerStyle = workbook.createCellStyle();
+            Font headerFont = workbook.createFont();
+            headerFont.setBold(true);
+            headerStyle.setFont(headerFont);
             headerStyle.setFillForegroundColor(IndexedColors.LIGHT_CORNFLOWER_BLUE.getIndex());
             headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 
@@ -44,10 +49,11 @@ public class ReportUtils {
 
             row.createCell(0).setCellValue("TC_" + testCase);
             row.createCell(1).setCellValue(status);
-            row.createCell(2).setCellValue(duration);
-            row.createCell(3).setCellValue(description);
+            row.createCell(2).setCellValue(CommonUtilities.getCurrentTime());
+            row.createCell(3).setCellValue(duration);
+            row.createCell(4).setCellValue(description);
 
-            for (int i = 0; i < 4; i++) sheet.autoSizeColumn(i);
+            for (int i = 0; i < 5; i++) sheet.autoSizeColumn(i);
 
             try (FileOutputStream fos = new FileOutputStream(file)) {
                 workbook.write(fos);

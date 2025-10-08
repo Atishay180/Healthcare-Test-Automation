@@ -19,7 +19,7 @@ import java.util.Map;
 public class ProjectRunnerClass {
     public static String sheetPath = System.getProperty("user.dir") + "/src/test/resources/data/TestingAutomationExcelSheet.xlsx";
     public static String sheetName = "Sheet1";
-    public static String TestCase = "";
+    public static String testCase = "";
     public static File reportFile;
 
     WebDriver driver;
@@ -47,8 +47,8 @@ public class ProjectRunnerClass {
         String description = "Executed successfully";
 
         try {
-            String TestCase = args.get("Test Case");
-            String folderPath = CommonUtilities.createTestCaseFolder(TestCase);
+            testCase = args.get("Test Case");
+            String folderPath = CommonUtilities.createTestCaseFolder(testCase);
 
             driver.get("http://localhost:5173");
             driver.manage().window().fullscreen();

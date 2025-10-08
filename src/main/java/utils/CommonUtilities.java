@@ -1,8 +1,6 @@
 package utils;
 
 import org.openqa.selenium.*;
-import org.openqa.selenium.io.FileHandler;
-import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -11,6 +9,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 public class CommonUtilities {
@@ -45,8 +45,7 @@ public class CommonUtilities {
     // today's date in day-month-year format method
     public static String getTodaysDate(){
         SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy");
-        String todayDate = formatter.format(new Date());
-        return todayDate;
+        return formatter.format(new Date());
     }
 
     // today's date folder creation method
@@ -162,4 +161,13 @@ public class CommonUtilities {
         }
     }
 
+    // get current time method
+    public static String getCurrentTime(){
+        LocalTime currentTime = LocalTime.now();
+
+        // format (HH for 24-hour format, mm for minutes)
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+
+        return currentTime.format(formatter);
+    }
 }
