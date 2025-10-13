@@ -3,6 +3,7 @@ package pages;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 import utils.CommonUtilities;
@@ -86,5 +87,21 @@ public class HomePage {
             driver.quit();
             throw new RuntimeException(e);
         }
+    }
+
+    public ProfilePage navigateToProfilePage(){
+        By profileDropdownLocator = By.id("profile-dropdown");
+        CommonUtilities.waitUntilVisibleByLocator(driver, profileDropdownLocator);
+        WebElement profileDropDownElement = driver.findElement(profileDropdownLocator);
+
+        Actions actions = new Actions(driver);
+        actions.moveToElement(profileDropDownElement).perform();
+
+        WebElement myProfile = driver.findElement(By.xpath("//p[text()=\"My Profile\"]"));
+        myProfile.click();
+
+        CommonUtilities.captureScreenshot("My Profile", driver);
+
+        return new ProfilePage(driver, args);
     }
 }

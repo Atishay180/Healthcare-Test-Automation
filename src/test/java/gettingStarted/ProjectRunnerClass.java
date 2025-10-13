@@ -10,6 +10,7 @@ import org.testng.annotations.*;
 import pages.AppointmentPage;
 import pages.AuthPage;
 import pages.HomePage;
+import pages.ProfilePage;
 import utils.CommonUtilities;
 import utils.ReportUtils;
 
@@ -59,12 +60,12 @@ public class ProjectRunnerClass {
             AuthPage authPage = homepage.getAuthPage();
             authPage.loginUser();
 
-            if(args.get("Book Appointment").equalsIgnoreCase("Yes")){
+            if(args.get("Book Appointment").equalsIgnoreCase("Yes") || args.get("Book Appointment").equalsIgnoreCase("Y")){
                 AppointmentPage appointmentPage = homepage.navigateToAppointmentPage(args.get("Doctor Name"));
                 appointmentPage.bookAppointment();
             }
 
-            if(args.get("My Appointments").equalsIgnoreCase("Yes")){
+            else if(args.get("My Appointments").equalsIgnoreCase("Yes") || args.get("My Appointments").equalsIgnoreCase("Y")){
                 By profileDropdownLocator = By.id("profile-dropdown");
                 CommonUtilities.waitUntilVisibleByLocator(driver, profileDropdownLocator);
                 WebElement profileDropdownElement = driver.findElement(profileDropdownLocator);
@@ -78,6 +79,14 @@ public class ProjectRunnerClass {
                 myAppointments.click();
 
                 CommonUtilities.captureScreenshot("My Appointments", driver);
+            }
+
+            else if(args.get("My Profile").equalsIgnoreCase("Yes") || args.get("My Profile").equalsIgnoreCase("Y")){
+                ProfilePage profilePage = homepage.navigateToProfilePage();
+
+                if(args.get("Update Profile").equalsIgnoreCase("Yes") || args.get("Update Profile").equalsIgnoreCase("Y")){
+                    profilePage.editProfile();
+                }
             }
         } catch (Exception e) {
             status = "FAIL";
