@@ -170,4 +170,16 @@ public class CommonUtilities {
 
         return currentTime.format(formatter);
     }
+
+    // upload files
+    public static void uploadFile(String fileName, WebElement fileInputElement){
+        try {
+            System.out.println("Uploading file...");
+            String filePath = System.getProperty("user.dir") + "/UploadFiles/" + fileName;
+            fileInputElement.sendKeys(filePath);
+            System.out.println("File uploaded successfully: " + filePath);
+        } catch (Exception e) {
+            throw new RuntimeException("File upload failed: " + e.getMessage(), e);
+        }
+    }
 }

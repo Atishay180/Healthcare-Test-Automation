@@ -35,6 +35,9 @@ public class ProfilePage {
     @FindBy (xpath = "//p[contains(text(), \"Birthday\")]/following-sibling::input")
     private WebElement txtDob;
 
+    @FindBy (xpath = "//label/input[@id=\"image\"]")
+    private WebElement fileUploadPath;
+
     @FindBy (xpath = "//button[text()=\"Save Information\"]")
     private WebElement btnSaveInformation;
 
@@ -72,9 +75,13 @@ public class ProfilePage {
             txtDob.sendKeys(dob);
             System.out.println("DOB updated to: " + dob);
 
-            //update image if yes
+            //update profile pic if yes
+            if(args.get("Update Image").equalsIgnoreCase("Yes") || args.get("Update Image").equalsIgnoreCase("Y")){
+                CommonUtilities.uploadFile(args.get("ImageFile Name"), fileUploadPath);
+            }
 
             //save
+            CommonUtilities.waitUntilVisible(driver, btnSaveInformation);
             btnSaveInformation.click();
 
             CommonUtilities.waitUntilVisible(driver, btnEditProfile);

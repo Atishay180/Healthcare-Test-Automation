@@ -89,6 +89,24 @@ public class HomePage {
         }
     }
 
+    public MyAppointmentsPage navigateToMyAppointmentsPage(){
+        By profileDropdownLocator = By.id("profile-dropdown");
+        CommonUtilities.waitUntilVisibleByLocator(driver, profileDropdownLocator);
+        WebElement profileDropdownElement = driver.findElement(profileDropdownLocator);
+
+        // Hover over the parent menu
+        Actions actions = new Actions(driver);
+        actions.moveToElement(profileDropdownElement).perform();
+
+        WebElement myAppointments = driver.findElement(By.xpath("//div/p[text()=\"My Appointments\"]"));
+        CommonUtilities.waitUntilVisible(driver, myAppointments);
+        myAppointments.click();
+
+        CommonUtilities.captureScreenshot("My Appointments", driver);
+
+        return new MyAppointmentsPage(driver, args);
+    }
+
     public ProfilePage navigateToProfilePage(){
         By profileDropdownLocator = By.id("profile-dropdown");
         CommonUtilities.waitUntilVisibleByLocator(driver, profileDropdownLocator);
